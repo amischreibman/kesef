@@ -1,171 +1,166 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import type { PasswordEntry, Profile } from "@/lib/types";
-import { t } from "@/lib/i18n";
-import { loadEntries, saveEntries, uid } from "@/lib/storage";
-import { PrimaryButton, SecondaryButton } from "./ui";
+import {
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import type { PasswordEntry, Profile } from "../lib/types";
+import { t } from "../lib/i18n";
+import { loadEntries, saveEntries, uid } from "../lib/storage";
+import { colors, fonts } from "../lib/theme";
+import { LangContext } from "../lib/lang";
+import { BigField, PrimaryButton, SecondaryButton } from "./ui";
 
 export default function MainScreen({ profile }: { profile: Profile }) {
   const d = t[profile.lang];
-  const [entries, setEntries] = useState<PasswordEntry[]>(() => loadEntries());
+  const align = profile.lang === "he" ? "right" : "left";
+  const [entries, setEntries] = useState<PasswordEntry[]>([]);
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
-    document.documentElement.lang = profile.lang;
-    document.documentElement.dir = d.dir;
-  }, [profile.lang, d.dir]);
+    loadEntries().then(setEntries);
+  }, []);
 
   function addEntry(entry: PasswordEntry) {
     const updated = [entry, ...entries];
     setEntries(updated);
-    saveEntries(updated);
+    void saveEntries(updated);
     setAdding(false);
   }
 
   function deleteEntry(id: string) {
-    if (!window.confirm(d.confirmDelete)) return;
-    const updated = entries.filter((e) => e.id !== id);
-    setEntries(updated);
-    saveEntries(updated);
+    Alert.alert(d.confirmDelete, undefined, [
+      { text: d.cancel, style: "cancel" },
+      {
+        text: d.delete,
+        style: "destructive",
+        onPress: () => {
+          const updated = entries.filter((e) => e.id !== id);
+          setEntries(updated);
+          void saveEntries(updated);
+        },
+      },
+    ]);
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-5 py-8">
-        {/* Header */}
-        <header className="mb-8 flex items-center justify-between">
-          <div>
-            <div className="text-xl font-medium text-neutral-500">
+    <LangContext.Provider value={profile.lang}>
+      <View style={styles.flex}>
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <View style={styles.header}>
+            <Text style={[styles.appName, { textAlign: align }]}>
               {d.appName}
-            </div>
-            <h1 className="text-3xl font-extrabold text-black">
+            </Text>
+            <Text style={[styles.greeting, { textAlign: align }]}>
               {d.mainGreeting(profile.name)}
-            </h1>
-          </div>
-        </header>
+            </Text>
+          </View>
 
-        {/* Entries or empty state */}
-        <div className="flex-1">
           {entries.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center text-center">
-              <p className="mb-10 max-w-md whitespace-pre-line text-2xl leading-relaxed text-neutral-600">
-                {d.mainEmpty}
-              </p>
-              <BigPlus label={d.addPassword} onClick={() => setAdding(true)} />
-            </div>
+            <View style={styles.empty}>
+              <Text style={styles.emptyText}>{d.mainEmpty}</Text>
+              <BigPlus label={d.addPassword} onPress={() => setAdding(true)} />
+            </View>
           ) : (
-            <div className="space-y-4">
+            <View style={{ gap: 16 }}>
               {entries.map((e) => (
                 <EntryCard
                   key={e.id}
                   entry={e}
                   d={d}
+                  align={align}
                   onDelete={() => deleteEntry(e.id)}
                 />
               ))}
-            </div>
+            </View>
           )}
-        </div>
+        </ScrollView>
 
-        {/* Floating add button when there are entries */}
         {entries.length > 0 && (
-          <div className="sticky bottom-6 mt-8 flex justify-center">
-            <BigPlus label={d.addPassword} onClick={() => setAdding(true)} />
-          </div>
+          <View style={styles.fab}>
+            <BigPlus label={d.addPassword} onPress={() => setAdding(true)} />
+          </View>
         )}
-      </div>
 
-      {adding && (
-        <AddPasswordSheet d={d} onSave={addEntry} onCancel={() => setAdding(false)} />
-      )}
-    </div>
+        <Modal visible={adding} animationType="slide" transparent>
+          <AddPasswordSheet
+            d={d}
+            lang={profile.lang}
+            onSave={addEntry}
+            onCancel={() => setAdding(false)}
+          />
+        </Modal>
+      </View>
+    </LangContext.Provider>
   );
 }
 
-function BigPlus({ label, onClick }: { label: string; onClick: () => void }) {
+function BigPlus({ label, onPress }: { label: string; onPress: () => void }) {
   return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      className="flex flex-col items-center gap-3"
-    >
-      <span className="flex h-28 w-28 items-center justify-center rounded-full bg-blue-700 text-7xl font-light leading-none text-white shadow-lg transition-colors hover:bg-blue-800">
-        +
-      </span>
-      <span className="text-2xl font-bold text-blue-700">{label}</span>
-    </button>
+    <Pressable onPress={onPress} style={styles.plusWrap}>
+      <View style={styles.plusCircle}>
+        <Text style={styles.plusSign}>+</Text>
+      </View>
+      <Text style={styles.plusLabel}>{label}</Text>
+    </Pressable>
   );
 }
 
 function EntryCard({
   entry,
   d,
+  align,
   onDelete,
 }: {
   entry: PasswordEntry;
   d: (typeof t)["he"];
+  align: "right" | "left";
   onDelete: () => void;
 }) {
   const [show, setShow] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(entry.password);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
-      /* clipboard may be unavailable */
-    }
-  }
-
   return (
-    <div className="rounded-2xl border-2 border-neutral-200 p-5">
-      <div className="mb-2 flex items-start justify-between gap-3">
-        <h2 className="text-3xl font-extrabold text-black">{entry.title}</h2>
-        <button
-          onClick={onDelete}
-          className="text-xl font-bold text-red-600 hover:underline"
-        >
-          {d.delete}
-        </button>
-      </div>
-      {entry.username && (
-        <div className="mb-2 text-2xl text-neutral-700" dir="ltr" style={{ textAlign: "start" }}>
-          {entry.username}
-        </div>
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={[styles.cardTitle, { textAlign: align }]}>
+          {entry.title}
+        </Text>
+        <Pressable onPress={onDelete}>
+          <Text style={styles.deleteText}>{d.delete}</Text>
+        </Pressable>
+      </View>
+      {entry.username !== "" && (
+        <Text style={styles.username}>{entry.username}</Text>
       )}
-      <div className="flex items-center gap-3">
-        <span className="text-2xl font-bold text-black" dir="ltr" style={{ textAlign: "start" }}>
+      <View style={styles.pwRow}>
+        <Text style={styles.pwText}>
           {show ? entry.password : "••••••••"}
-        </span>
-        <button
-          onClick={() => setShow((s) => !s)}
-          className="rounded-full border-2 border-neutral-300 px-4 py-1 text-lg font-bold text-black hover:bg-neutral-100"
+        </Text>
+        <Pressable
+          onPress={() => setShow((s) => !s)}
+          style={styles.smallBtn}
         >
-          {show ? d.hide : d.show}
-        </button>
-        <button
-          onClick={copy}
-          className="rounded-full border-2 border-neutral-300 px-4 py-1 text-lg font-bold text-black hover:bg-neutral-100"
-        >
-          {copied ? d.copied : d.copy}
-        </button>
-      </div>
-      {entry.notes && (
-        <p className="mt-3 text-xl text-neutral-600">{entry.notes}</p>
+          <Text style={styles.smallBtnText}>{show ? d.hide : d.show}</Text>
+        </Pressable>
+      </View>
+      {entry.notes !== "" && (
+        <Text style={[styles.notes, { textAlign: align }]}>{entry.notes}</Text>
       )}
-    </div>
+    </View>
   );
 }
 
 function AddPasswordSheet({
   d,
+  lang,
   onSave,
   onCancel,
 }: {
   d: (typeof t)["he"];
+  lang: Profile["lang"];
   onSave: (entry: PasswordEntry) => void;
   onCancel: () => void;
 }) {
@@ -186,80 +181,170 @@ function AddPasswordSheet({
     });
   }
 
+  const align = lang === "he" ? "right" : "left";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center">
-      <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white p-6 sm:rounded-3xl">
-        <h2 className="mb-6 text-3xl font-extrabold text-black">
-          {d.newPassword}
-        </h2>
-        <div className="space-y-5">
-          <Field
-            label={d.pwTitle}
-            placeholder={d.pwTitlePlaceholder}
-            value={title}
-            onChange={setTitle}
-            autoFocus
-          />
-          <Field
-            label={d.pwUsername}
-            placeholder={d.pwUsernamePlaceholder}
-            value={username}
-            onChange={setUsername}
-          />
-          <Field
-            label={d.pwPassword}
-            placeholder={d.pwPasswordPlaceholder}
-            value={password}
-            onChange={setPassword}
-          />
-          <Field
-            label={d.pwNotes}
-            placeholder={d.pwNotesPlaceholder}
-            value={notes}
-            onChange={setNotes}
-          />
-        </div>
-        <div className="mt-8 flex gap-4">
-          <div className="flex-1">
-            <SecondaryButton onClick={onCancel}>{d.cancel}</SecondaryButton>
-          </div>
-          <div className="flex-[2]">
-            <PrimaryButton
-              onClick={save}
-              disabled={!title.trim() || !password.trim()}
-            >
-              {d.save}
-            </PrimaryButton>
-          </div>
-        </div>
-      </div>
-    </div>
+    <LangContext.Provider value={lang}>
+      <View style={styles.sheetBackdrop}>
+        <View style={styles.sheet}>
+          <ScrollView
+            contentContainerStyle={{ padding: 24, gap: 20 }}
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text style={[styles.sheetTitle, { textAlign: align }]}>
+              {d.newPassword}
+            </Text>
+            <BigField
+              label={d.pwTitle}
+              placeholder={d.pwTitlePlaceholder}
+              value={title}
+              onChangeText={setTitle}
+            />
+            <BigField
+              label={d.pwUsername}
+              placeholder={d.pwUsernamePlaceholder}
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+            />
+            <BigField
+              label={d.pwPassword}
+              placeholder={d.pwPasswordPlaceholder}
+              value={password}
+              onChangeText={setPassword}
+              autoCapitalize="none"
+            />
+            <BigField
+              label={d.pwNotes}
+              placeholder={d.pwNotesPlaceholder}
+              value={notes}
+              onChangeText={setNotes}
+            />
+            <View style={styles.navRow}>
+              <View style={{ flex: 1 }}>
+                <SecondaryButton title={d.cancel} onPress={onCancel} />
+              </View>
+              <View style={{ flex: 2 }}>
+                <PrimaryButton
+                  title={d.save}
+                  onPress={save}
+                  disabled={!title.trim() || !password.trim()}
+                />
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+    </LangContext.Provider>
   );
 }
 
-function Field({
-  label,
-  placeholder,
-  value,
-  onChange,
-  autoFocus,
-}: {
-  label: string;
-  placeholder: string;
-  value: string;
-  onChange: (v: string) => void;
-  autoFocus?: boolean;
-}) {
-  return (
-    <label className="block">
-      <span className="mb-2 block text-2xl font-medium text-black">{label}</span>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        autoFocus={autoFocus}
-        className="w-full rounded-2xl border-2 border-neutral-300 bg-white px-5 py-4 text-2xl text-black placeholder:text-neutral-400 focus:border-blue-700"
-      />
-    </label>
-  );
-}
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  scroll: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 140,
+    maxWidth: 640,
+    width: "100%",
+    alignSelf: "center",
+  },
+  header: { marginBottom: 28 },
+  appName: { fontFamily: fonts.medium, fontSize: 18, color: colors.textFaint },
+  greeting: { fontFamily: fonts.extra, fontSize: 30, color: colors.text },
+  empty: { alignItems: "center", paddingTop: 60 },
+  emptyText: {
+    fontFamily: fonts.regular,
+    fontSize: 22,
+    color: colors.textMuted,
+    textAlign: "center",
+    lineHeight: 32,
+    marginBottom: 40,
+    maxWidth: 420,
+  },
+  plusWrap: { alignItems: "center", gap: 12 },
+  plusCircle: {
+    width: 112,
+    height: 112,
+    borderRadius: 999,
+    backgroundColor: colors.blue,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
+  },
+  plusSign: {
+    color: "#fff",
+    fontSize: 64,
+    lineHeight: 72,
+    fontFamily: fonts.regular,
+  },
+  plusLabel: { fontFamily: fonts.bold, fontSize: 22, color: colors.blue },
+  fab: {
+    position: "absolute",
+    bottom: 28,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+  card: {
+    borderWidth: 2,
+    borderColor: "#e5e5e5",
+    borderRadius: 16,
+    padding: 18,
+  },
+  cardHead: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    marginBottom: 8,
+    gap: 12,
+  },
+  cardTitle: { flex: 1, fontFamily: fonts.extra, fontSize: 28, color: colors.text },
+  deleteText: { fontFamily: fonts.bold, fontSize: 18, color: colors.red },
+  username: {
+    fontFamily: fonts.regular,
+    fontSize: 21,
+    color: colors.textMuted,
+    marginBottom: 8,
+    textAlign: "left",
+    writingDirection: "ltr",
+  },
+  pwRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+  pwText: {
+    fontFamily: fonts.bold,
+    fontSize: 22,
+    color: colors.text,
+    writingDirection: "ltr",
+  },
+  smallBtn: {
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+  },
+  smallBtnText: { fontFamily: fonts.bold, fontSize: 16, color: colors.text },
+  notes: {
+    fontFamily: fonts.regular,
+    fontSize: 18,
+    color: colors.textMuted,
+    marginTop: 12,
+  },
+  sheetBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  sheet: {
+    backgroundColor: colors.bg,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    maxHeight: "92%",
+  },
+  sheetTitle: { fontFamily: fonts.extra, fontSize: 28, color: colors.text },
+  navRow: { flexDirection: "row", gap: 14, marginTop: 8 },
+});

@@ -1,12 +1,16 @@
-"use client";
+import { ReactNode } from "react";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  View,
+} from "react-native";
+import { colors, fonts } from "../lib/theme";
+import { useAlign } from "../lib/lang";
 
-import type {
-  ButtonHTMLAttributes,
-  InputHTMLAttributes,
-  ReactNode,
-} from "react";
-
-/** A large, high-contrast text input with a clear label. */
+/** A large, high-contrast labeled text field. */
 export function BigField({
   label,
   hint,
@@ -14,53 +18,166 @@ export function BigField({
 }: {
   label: string;
   hint?: string;
-} & InputHTMLAttributes<HTMLInputElement>) {
+} & TextInputProps) {
+  const align = useAlign();
   return (
-    <label className="block">
-      <span className="mb-2 block text-2xl font-medium text-black">
-        {label}
-      </span>
+    <View style={styles.fieldWrap}>
+      <Text style={[styles.label, { textAlign: align }]}>{label}</Text>
       {hint ? (
-        <span className="mb-3 block text-lg text-neutral-600">{hint}</span>
+        <Text style={[styles.hint, { textAlign: align }]}>{hint}</Text>
       ) : null}
-      <input
+      <TextInput
+        placeholderTextColor={colors.textFaint}
         {...props}
-        className="w-full rounded-2xl border-2 border-neutral-300 bg-white px-5 py-4 text-2xl text-black placeholder:text-neutral-400 focus:border-blue-700"
+        style={[styles.input, { textAlign: align }]}
       />
-    </label>
+    </View>
   );
 }
 
-/** Primary big button. */
+/** Plain large text input (no label) for inline rows. */
+export function BigInput(props: TextInputProps) {
+  const align = useAlign();
+  return (
+    <TextInput
+      placeholderTextColor={colors.textFaint}
+      {...props}
+      style={[styles.input, { textAlign: align }, props.style]}
+    />
+  );
+}
+
 export function PrimaryButton({
-  children,
-  ...props
+  title,
+  onPress,
+  disabled,
 }: {
-  children: ReactNode;
-} & ButtonHTMLAttributes<HTMLButtonElement>) {
+  title: string;
+  onPress: () => void;
+  disabled?: boolean;
+}) {
   return (
-    <button
-      {...props}
-      className="w-full rounded-2xl bg-blue-700 px-6 py-5 text-2xl font-bold text-white transition-colors hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-500"
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      style={({ pressed }) => [
+        styles.btn,
+        { backgroundColor: disabled ? colors.disabled : colors.blue },
+        pressed && !disabled && { backgroundColor: colors.blueDark },
+      ]}
     >
-      {children}
-    </button>
+      <Text
+        style={[
+          styles.btnText,
+          { color: disabled ? colors.textMuted : "#ffffff" },
+        ]}
+      >
+        {title}
+      </Text>
+    </Pressable>
   );
 }
 
-/** Secondary big button (outline). */
 export function SecondaryButton({
-  children,
-  ...props
+  title,
+  onPress,
 }: {
-  children: ReactNode;
-} & ButtonHTMLAttributes<HTMLButtonElement>) {
+  title: string;
+  onPress: () => void;
+}) {
   return (
-    <button
-      {...props}
-      className="w-full rounded-2xl border-2 border-neutral-400 bg-white px-6 py-5 text-2xl font-bold text-black transition-colors hover:bg-neutral-100"
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.btn,
+        styles.btnOutline,
+        pressed && { backgroundColor: "#f5f5f5" },
+      ]}
     >
-      {children}
-    </button>
+      <Text style={[styles.btnText, { color: colors.text }]}>{title}</Text>
+    </Pressable>
   );
 }
+
+/** A large selectable option (gender, marital status, etc.). */
+export function ChoiceButton({
+  label,
+  active,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.choice,
+        active
+          ? { backgroundColor: colors.blue, borderColor: colors.blue }
+          : { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
+    >
+      <Text
+        style={[
+          styles.choiceText,
+          { color: active ? "#ffffff" : colors.text },
+        ]}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  fieldWrap: { width: "100%" },
+  label: {
+    fontFamily: fonts.medium,
+    fontSize: 22,
+    color: colors.text,
+    marginBottom: 8,
+  },
+  hint: {
+    fontFamily: fonts.regular,
+    fontSize: 17,
+    color: colors.textMuted,
+    marginBottom: 10,
+  },
+  input: {
+    width: "100%",
+    borderWidth: 2,
+    borderColor: colors.border,
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    fontSize: 22,
+    fontFamily: fonts.regular,
+    color: colors.text,
+  },
+  btn: {
+    width: "100%",
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  btnOutline: {
+    backgroundColor: colors.card,
+    borderWidth: 2,
+    borderColor: colors.borderStrong,
+  },
+  btnText: { fontFamily: fonts.bold, fontSize: 22 },
+  choice: {
+    borderWidth: 2,
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  choiceText: { fontFamily: fonts.bold, fontSize: 21, textAlign: "center" },
+});

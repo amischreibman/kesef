@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "כסף",
+    "slug": "kesef",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "backgroundColor": "#ffffff",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kesef.app"
+    },
+    "android": {
+      "package": "com.kesef.app"
+    }
+  }
+}

@@ -1,6 +1,13 @@
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import type {
   Child,
   Gender,
@@ -8,7 +15,7 @@ import type {
   MaritalStatus,
   Profile,
   SecurityQA,
-} from "@/lib/types";
+} from "../lib/types";
 import {
   MARITAL_OPTIONS,
   buildQuestionBank,
@@ -17,9 +24,17 @@ import {
   spousePlaceholder,
   spouseQuestion,
   t,
-} from "@/lib/i18n";
-import { uid } from "@/lib/storage";
-import { BigField, PrimaryButton, SecondaryButton } from "./ui";
+} from "../lib/i18n";
+import { uid } from "../lib/storage";
+import { colors, fonts } from "../lib/theme";
+import { LangContext, useAlign } from "../lib/lang";
+import {
+  BigField,
+  BigInput,
+  ChoiceButton,
+  PrimaryButton,
+  SecondaryButton,
+} from "./ui";
 
 const TOTAL_STEPS = 3;
 
@@ -47,12 +62,7 @@ export default function Onboarding({
   const [selected, setSelected] = useState<SecurityQA[]>([]);
 
   const d = t[lang];
-
-  // Keep the document direction/lang in sync with the chosen language.
-  useEffect(() => {
-    document.documentElement.lang = lang;
-    document.documentElement.dir = d.dir;
-  }, [lang, d.dir]);
+  const align = lang === "he" ? "right" : "left";
 
   function toggleLang() {
     setLang((l) => (l === "he" ? "en" : "he"));
@@ -104,28 +114,22 @@ export default function Onboarding({
     ]);
   }
   function setCustomQuestionText(id: string, question: string) {
-    setSelected((s) =>
-      s.map((q) => (q.id === id ? { ...q, question } : q))
-    );
+    setSelected((s) => s.map((q) => (q.id === id ? { ...q, question } : q)));
   }
   function removeCustom(id: string) {
     setSelected((s) => s.filter((q) => q.id !== id));
   }
 
-  // ---- Validation per step ----
+  // ---- Validation ----
   function validate(): boolean {
     setError("");
-    if (step === 1) {
-      if (!name.trim() || !gender || !maritalStatus) {
-        setError(d.required);
-        return false;
-      }
+    if (step === 1 && (!name.trim() || !gender || !maritalStatus)) {
+      setError(d.required);
+      return false;
     }
-    if (step === 2) {
-      if (!email.trim() || !address.trim() || !phone.trim()) {
-        setError(d.required);
-        return false;
-      }
+    if (step === 2 && (!email.trim() || !address.trim() || !phone.trim())) {
+      setError(d.required);
+      return false;
     }
     if (step === 3) {
       const answered = selected.filter(
@@ -145,7 +149,6 @@ export default function Onboarding({
       setStep((s) => s + 1);
       return;
     }
-    // Finish
     const profile: Profile = {
       lang,
       name: name.trim(),
@@ -159,7 +162,11 @@ export default function Onboarding({
       phone: phone.trim(),
       securityQuestions: selected
         .filter((q) => q.question.trim() && q.answer.trim())
-        .map((q) => ({ ...q, question: q.question.trim(), answer: q.answer.trim() })),
+        .map((q) => ({
+          ...q,
+          question: q.question.trim(),
+          answer: q.answer.trim(),
+        })),
       createdAt: Date.now(),
     };
     onDone(profile);
@@ -170,96 +177,111 @@ export default function Onboarding({
     setStep((s) => Math.max(0, s - 1));
   }
 
+  const answeredCount = selected.filter(
+    (q) => q.question.trim() && q.answer.trim()
+  ).length;
+
   return (
-    <div className="min-h-screen bg-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-5 py-8">
-        {/* Header: language toggle */}
-        <div className="mb-6 flex items-center justify-between">
-          <span className="text-2xl font-extrabold text-black">{d.appName}</span>
-          <button
-            onClick={toggleLang}
-            className="rounded-full border-2 border-neutral-400 px-5 py-2 text-xl font-bold text-black hover:bg-neutral-100"
-          >
-            {d.langName}
-          </button>
-        </div>
+    <LangContext.Provider value={lang}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          style={styles.flex}
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.appName}>{d.appName}</Text>
+            <Pressable style={styles.langBtn} onPress={toggleLang}>
+              <Text style={styles.langBtnText}>{d.langName}</Text>
+            </Pressable>
+          </View>
 
-        {/* Progress bar (hidden on welcome) */}
-        {step > 0 && (
-          <div className="mb-8">
-            <div className="mb-2 text-xl font-medium text-neutral-600">
-              {d.stepOf(step, TOTAL_STEPS)}
-            </div>
-            <div className="flex gap-2">
-              {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-3 flex-1 rounded-full ${
-                    i < step ? "bg-blue-700" : "bg-neutral-200"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+          {/* Progress */}
+          {step > 0 && (
+            <View style={{ marginBottom: 24 }}>
+              <Text style={[styles.progressLabel, { textAlign: align }]}>
+                {d.stepOf(step, TOTAL_STEPS)}
+              </Text>
+              <View style={styles.progressRow}>
+                {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+                  <View
+                    key={i}
+                    style={[
+                      styles.progressSeg,
+                      {
+                        backgroundColor:
+                          i < step ? colors.blue : "#e5e5e5",
+                      },
+                    ]}
+                  />
+                ))}
+              </View>
+            </View>
+          )}
 
-        {/* Body */}
-        <div className="flex-1">
           {step === 0 && <Welcome d={d} onStart={() => setStep(1)} />}
 
           {step === 1 && (
-            <div className="space-y-8">
-              <h1 className="text-4xl font-extrabold text-black">{d.s1Title}</h1>
+            <View style={{ gap: 28 }}>
+              <Text style={[styles.h1, { textAlign: align }]}>{d.s1Title}</Text>
 
               <BigField
                 label={d.qName}
                 placeholder={d.qNamePlaceholder}
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoFocus
+                onChangeText={setName}
               />
 
               {/* Gender */}
-              <div>
-                <span className="mb-3 block text-2xl font-medium text-black">
+              <View>
+                <Text style={[styles.label, { textAlign: align }]}>
                   {d.qGender}
-                </span>
-                <div className="grid grid-cols-2 gap-4">
-                  <ChoiceButton
-                    active={gender === "male"}
-                    onClick={() => setGender("male")}
-                  >
-                    {d.genderMale}
-                  </ChoiceButton>
-                  <ChoiceButton
-                    active={gender === "female"}
-                    onClick={() => setGender("female")}
-                  >
-                    {d.genderFemale}
-                  </ChoiceButton>
-                </div>
-              </div>
+                </Text>
+                <View style={styles.grid2}>
+                  <View style={styles.gridItem2}>
+                    <ChoiceButton
+                      label={d.genderMale}
+                      active={gender === "male"}
+                      onPress={() => setGender("male")}
+                    />
+                  </View>
+                  <View style={styles.gridItem2}>
+                    <ChoiceButton
+                      label={d.genderFemale}
+                      active={gender === "female"}
+                      onPress={() => setGender("female")}
+                    />
+                  </View>
+                </View>
+              </View>
 
               {/* Marital status */}
-              <div>
-                <span className="mb-3 block text-2xl font-medium text-black">
+              <View>
+                <Text style={[styles.label, { textAlign: align }]}>
                   {d.qMarital}
-                </span>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                </Text>
+                <View style={{ gap: 12 }}>
                   {MARITAL_OPTIONS.map((opt) => (
                     <ChoiceButton
                       key={opt}
+                      label={maritalLabel(
+                        opt,
+                        (gender || "male") as Gender,
+                        lang
+                      )}
                       active={maritalStatus === opt}
-                      onClick={() => setMaritalStatus(opt)}
-                    >
-                      {maritalLabel(opt, (gender || "male") as Gender, lang)}
-                    </ChoiceButton>
+                      onPress={() => setMaritalStatus(opt)}
+                    />
                   ))}
-                </div>
-              </div>
+                </View>
+              </View>
 
-              {/* Spouse name (adaptive) */}
-              {maritalStatus && hasSpouse(maritalStatus) && (
+              {/* Spouse (adaptive) */}
+              {maritalStatus !== "" && hasSpouse(maritalStatus) && (
                 <BigField
                   label={spouseQuestion(
                     maritalStatus,
@@ -268,202 +290,210 @@ export default function Onboarding({
                   )}
                   placeholder={spousePlaceholder(lang)}
                   value={spouseName}
-                  onChange={(e) => setSpouseName(e.target.value)}
+                  onChangeText={setSpouseName}
                 />
               )}
 
               {/* Children */}
-              <div>
-                <span className="mb-3 block text-2xl font-medium text-black">
+              <View>
+                <Text style={[styles.label, { textAlign: align }]}>
                   {d.qChildren}
-                </span>
-                <div className="space-y-3">
+                </Text>
+                <View style={{ gap: 12 }}>
                   {children.map((c, i) => (
-                    <div key={c.id} className="flex items-center gap-3">
-                      <input
-                        value={c.name}
-                        onChange={(e) => setChildName(c.id, e.target.value)}
-                        placeholder={d.childPlaceholder(i + 1)}
-                        className="w-full rounded-2xl border-2 border-neutral-300 bg-white px-5 py-4 text-2xl text-black placeholder:text-neutral-400 focus:border-blue-700"
-                      />
+                    <View key={c.id} style={styles.childRow}>
+                      <View style={styles.flex}>
+                        <BigInput
+                          placeholder={d.childPlaceholder(i + 1)}
+                          value={c.name}
+                          onChangeText={(v) => setChildName(c.id, v)}
+                        />
+                      </View>
                       {children.length > 1 && (
-                        <button
-                          onClick={() => removeChild(c.id)}
-                          aria-label={d.removeChild}
-                          className="shrink-0 rounded-2xl border-2 border-neutral-300 px-4 py-4 text-2xl text-neutral-600 hover:bg-neutral-100"
+                        <Pressable
+                          onPress={() => removeChild(c.id)}
+                          style={styles.removeBtn}
                         >
-                          ✕
-                        </button>
+                          <Text style={styles.removeBtnText}>✕</Text>
+                        </Pressable>
                       )}
-                    </div>
+                    </View>
                   ))}
-                </div>
-                <button
-                  onClick={addChild}
-                  className="mt-4 text-xl font-bold text-blue-700 hover:underline"
-                >
-                  + {d.addChild}
-                </button>
-              </div>
-            </div>
+                </View>
+                <Pressable onPress={addChild} style={{ marginTop: 14 }}>
+                  <Text style={[styles.linkAdd, { textAlign: align }]}>
+                    + {d.addChild}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
           )}
 
           {step === 2 && (
-            <div className="space-y-8">
-              <h1 className="text-4xl font-extrabold text-black">{d.s2Title}</h1>
+            <View style={{ gap: 28 }}>
+              <Text style={[styles.h1, { textAlign: align }]}>{d.s2Title}</Text>
               <BigField
                 label={d.qEmail}
                 placeholder={d.qEmailPlaceholder}
-                type="email"
-                inputMode="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoFocus
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
               />
               <BigField
                 label={d.qAddress}
                 placeholder={d.qAddressPlaceholder}
                 value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                onChangeText={setAddress}
               />
               <BigField
                 label={d.qZip}
                 placeholder={d.qZipPlaceholder}
-                inputMode="numeric"
                 value={zip}
-                onChange={(e) => setZip(e.target.value)}
+                onChangeText={setZip}
+                keyboardType="number-pad"
               />
               <BigField
                 label={d.qPhone}
                 placeholder={d.qPhonePlaceholder}
-                type="tel"
-                inputMode="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChangeText={setPhone}
+                keyboardType="phone-pad"
               />
-            </div>
+            </View>
           )}
 
           {step === 3 && (
-            <div className="space-y-6">
-              <h1 className="text-4xl font-extrabold text-black">{d.s3Title}</h1>
-              <p className="text-xl text-neutral-700">{d.s3Body}</p>
-              <div className="text-lg font-bold text-blue-700">
-                {d.s3Selected(
-                  selected.filter((q) => q.question.trim() && q.answer.trim())
-                    .length
-                )}
-              </div>
+            <View style={{ gap: 18 }}>
+              <Text style={[styles.h1, { textAlign: align }]}>{d.s3Title}</Text>
+              <Text style={[styles.body, { textAlign: align }]}>
+                {d.s3Body}
+              </Text>
+              <Text style={[styles.selectedCount, { textAlign: align }]}>
+                {d.s3Selected(answeredCount)}
+              </Text>
 
-              <div className="space-y-4">
-                {bank.map((q) => {
-                  const on = isSelected(q.id);
-                  const entry = selected.find((s) => s.id === q.id);
-                  return (
-                    <div
-                      key={q.id}
-                      className={`rounded-2xl border-2 p-5 ${
-                        on ? "border-blue-700 bg-blue-50" : "border-neutral-300"
-                      }`}
+              {bank.map((q) => {
+                const on = isSelected(q.id);
+                const entry = selected.find((s) => s.id === q.id);
+                return (
+                  <View
+                    key={q.id}
+                    style={[
+                      styles.qCard,
+                      on
+                        ? { borderColor: colors.blue, backgroundColor: colors.blueBg }
+                        : { borderColor: colors.border },
+                    ]}
+                  >
+                    <Pressable
+                      onPress={() => toggleQuestion(q.id, q.question)}
+                      style={styles.qHead}
                     >
-                      <button
-                        onClick={() => toggleQuestion(q.id, q.question)}
-                        className="flex w-full items-center justify-between gap-4 text-start"
+                      <Text style={[styles.qText, { textAlign: align }]}>
+                        {q.question}
+                      </Text>
+                      <View
+                        style={[
+                          styles.pill,
+                          on
+                            ? { backgroundColor: colors.blue }
+                            : { borderWidth: 2, borderColor: colors.borderStrong },
+                        ]}
                       >
-                        <span className="text-2xl font-medium text-black">
-                          {q.question}
-                        </span>
-                        <span
-                          className={`shrink-0 rounded-full px-4 py-2 text-lg font-bold ${
-                            on
-                              ? "bg-blue-700 text-white"
-                              : "border-2 border-neutral-400 text-neutral-700"
-                          }`}
+                        <Text
+                          style={[
+                            styles.pillText,
+                            { color: on ? "#fff" : colors.textMuted },
+                          ]}
                         >
                           {on ? "✓ " + d.selectedQuestion : d.selectQuestion}
-                        </span>
-                      </button>
-                      {on && (
-                        <input
-                          value={entry?.answer ?? ""}
-                          onChange={(e) => setAnswer(q.id, e.target.value)}
+                        </Text>
+                      </View>
+                    </Pressable>
+                    {on && (
+                      <View style={{ marginTop: 14 }}>
+                        <BigInput
                           placeholder={d.answerPlaceholder}
-                          autoFocus
-                          className="mt-4 w-full rounded-2xl border-2 border-neutral-300 bg-white px-5 py-4 text-2xl text-black placeholder:text-neutral-400 focus:border-blue-700"
+                          value={entry?.answer ?? ""}
+                          onChangeText={(v) => setAnswer(q.id, v)}
                         />
-                      )}
-                    </div>
-                  );
-                })}
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
 
-                {/* Custom questions */}
-                {selected
-                  .filter((q) => q.custom)
-                  .map((q) => (
-                    <div
-                      key={q.id}
-                      className="rounded-2xl border-2 border-blue-700 bg-blue-50 p-5"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <input
-                          value={q.question}
-                          onChange={(e) =>
-                            setCustomQuestionText(q.id, e.target.value)
-                          }
+              {/* Custom questions */}
+              {selected
+                .filter((q) => q.custom)
+                .map((q) => (
+                  <View
+                    key={q.id}
+                    style={[
+                      styles.qCard,
+                      { borderColor: colors.blue, backgroundColor: colors.blueBg },
+                    ]}
+                  >
+                    <View style={styles.childRow}>
+                      <View style={styles.flex}>
+                        <BigInput
                           placeholder={d.ownQuestionPlaceholder}
-                          autoFocus
-                          className="w-full rounded-2xl border-2 border-neutral-300 bg-white px-5 py-4 text-2xl text-black placeholder:text-neutral-400 focus:border-blue-700"
+                          value={q.question}
+                          onChangeText={(v) => setCustomQuestionText(q.id, v)}
                         />
-                        <button
-                          onClick={() => removeCustom(q.id)}
-                          aria-label={d.removeChild}
-                          className="shrink-0 rounded-2xl border-2 border-neutral-300 px-4 py-4 text-2xl text-neutral-600 hover:bg-neutral-100"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      <input
-                        value={q.answer}
-                        onChange={(e) => setAnswer(q.id, e.target.value)}
+                      </View>
+                      <Pressable
+                        onPress={() => removeCustom(q.id)}
+                        style={styles.removeBtn}
+                      >
+                        <Text style={styles.removeBtnText}>✕</Text>
+                      </Pressable>
+                    </View>
+                    <View style={{ marginTop: 12 }}>
+                      <BigInput
                         placeholder={d.answerPlaceholder}
-                        className="mt-3 w-full rounded-2xl border-2 border-neutral-300 bg-white px-5 py-4 text-2xl text-black placeholder:text-neutral-400 focus:border-blue-700"
+                        value={q.answer}
+                        onChangeText={(v) => setAnswer(q.id, v)}
                       />
-                    </div>
-                  ))}
-              </div>
+                    </View>
+                  </View>
+                ))}
 
-              <button
-                onClick={addCustomQuestion}
-                className="text-xl font-bold text-blue-700 hover:underline"
-              >
-                + {d.addOwnQuestion}
-              </button>
-            </div>
+              <Pressable onPress={addCustomQuestion}>
+                <Text style={[styles.linkAdd, { textAlign: align }]}>
+                  + {d.addOwnQuestion}
+                </Text>
+              </Pressable>
+            </View>
           )}
-        </div>
 
-        {/* Error */}
-        {error && (
-          <div className="mt-6 rounded-2xl bg-red-50 px-5 py-4 text-xl font-bold text-red-700">
-            {error}
-          </div>
-        )}
+          {/* Error */}
+          {error !== "" && (
+            <View style={styles.errorBox}>
+              <Text style={[styles.errorText, { textAlign: align }]}>
+                {error}
+              </Text>
+            </View>
+          )}
 
-        {/* Footer navigation */}
-        {step > 0 && (
-          <div className="mt-8 flex gap-4">
-            <div className="flex-1">
-              <SecondaryButton onClick={back}>{d.back}</SecondaryButton>
-            </div>
-            <div className="flex-[2]">
-              <PrimaryButton onClick={next}>
-                {step === TOTAL_STEPS ? d.finish : d.next}
-              </PrimaryButton>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+          {/* Navigation */}
+          {step > 0 && (
+            <View style={styles.navRow}>
+              <View style={{ flex: 1 }}>
+                <SecondaryButton title={d.back} onPress={back} />
+              </View>
+              <View style={{ flex: 2 }}>
+                <PrimaryButton
+                  title={step === TOTAL_STEPS ? d.finish : d.next}
+                  onPress={next}
+                />
+              </View>
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LangContext.Provider>
   );
 }
 
@@ -475,41 +505,117 @@ function Welcome({
   onStart: () => void;
 }) {
   return (
-    <div className="flex h-full flex-col items-center justify-center text-center">
-      <div className="mb-6 text-7xl">🔐</div>
-      <h1 className="mb-4 text-5xl font-extrabold text-black">
-        {d.welcomeTitle}
-      </h1>
-      <p className="mb-2 text-2xl font-bold text-blue-700">{d.tagline}</p>
-      <p className="mb-10 max-w-md text-2xl leading-relaxed text-neutral-700">
-        {d.welcomeBody}
-      </p>
-      <div className="w-full max-w-sm">
-        <PrimaryButton onClick={onStart}>{d.welcomeStart}</PrimaryButton>
-      </div>
-    </div>
+    <View style={styles.welcome}>
+      <Text style={styles.welcomeIcon}>🔐</Text>
+      <Text style={styles.welcomeTitle}>{d.welcomeTitle}</Text>
+      <Text style={styles.tagline}>{d.tagline}</Text>
+      <Text style={styles.welcomeBody}>{d.welcomeBody}</Text>
+      <View style={{ width: "100%", maxWidth: 360, marginTop: 28 }}>
+        <PrimaryButton title={d.welcomeStart} onPress={onStart} />
+      </View>
+    </View>
   );
 }
 
-function ChoiceButton({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`rounded-2xl border-2 px-5 py-5 text-2xl font-bold transition-colors ${
-        active
-          ? "border-blue-700 bg-blue-700 text-white"
-          : "border-neutral-300 bg-white text-black hover:bg-neutral-100"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  scroll: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 40,
+    maxWidth: 640,
+    width: "100%",
+    alignSelf: "center",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  appName: { fontFamily: fonts.extra, fontSize: 26, color: colors.text },
+  langBtn: {
+    borderWidth: 2,
+    borderColor: colors.borderStrong,
+    borderRadius: 999,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+  },
+  langBtnText: { fontFamily: fonts.bold, fontSize: 18, color: colors.text },
+  progressLabel: {
+    fontFamily: fonts.medium,
+    fontSize: 18,
+    color: colors.textMuted,
+    marginBottom: 8,
+  },
+  progressRow: { flexDirection: "row", gap: 8 },
+  progressSeg: { flex: 1, height: 12, borderRadius: 999 },
+  h1: { fontFamily: fonts.extra, fontSize: 34, color: colors.text },
+  body: { fontFamily: fonts.regular, fontSize: 19, color: colors.textMuted },
+  label: {
+    fontFamily: fonts.medium,
+    fontSize: 22,
+    color: colors.text,
+    marginBottom: 12,
+  },
+  grid2: { flexDirection: "row", gap: 16 },
+  gridItem2: { flex: 1 },
+  childRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+  removeBtn: {
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  removeBtnText: { fontSize: 22, color: colors.textMuted },
+  linkAdd: { fontFamily: fonts.bold, fontSize: 19, color: colors.blue },
+  selectedCount: { fontFamily: fonts.bold, fontSize: 17, color: colors.blue },
+  qCard: { borderWidth: 2, borderRadius: 16, padding: 18 },
+  qHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 14,
+  },
+  qText: { flex: 1, fontFamily: fonts.medium, fontSize: 21, color: colors.text },
+  pill: {
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  pillText: { fontFamily: fonts.bold, fontSize: 16 },
+  errorBox: {
+    marginTop: 24,
+    backgroundColor: colors.redBg,
+    borderRadius: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+  },
+  errorText: { fontFamily: fonts.bold, fontSize: 18, color: colors.red },
+  navRow: { flexDirection: "row", gap: 14, marginTop: 28 },
+  welcome: { alignItems: "center", paddingTop: 40, paddingHorizontal: 8 },
+  welcomeIcon: { fontSize: 72, marginBottom: 16 },
+  welcomeTitle: {
+    fontFamily: fonts.extra,
+    fontSize: 44,
+    color: colors.text,
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  tagline: {
+    fontFamily: fonts.bold,
+    fontSize: 22,
+    color: colors.blue,
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  welcomeBody: {
+    fontFamily: fonts.regular,
+    fontSize: 22,
+    color: colors.textMuted,
+    textAlign: "center",
+    lineHeight: 32,
+    maxWidth: 420,
+  },
+});
