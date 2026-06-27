@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# כסף (Kesef) — מנהל סיסמאות פשוט
 
-## Getting Started
+אפליקציה מקומית לשמירת סיסמאות, מותאמת במיוחד לאנשים מבוגרים:
 
-First, run the development server:
+- **פשטות ומעט לחיצות** — כל מסך מציג מעט מאוד אפשרויות, בכפתורים גדולים.
+- **טקסט גדול ובניגודיות גבוהה** — פונט Rubik, טקסט שחור על רקע לבן.
+- **דו-לשוני** — עברית (מיושר לימין) ואנגלית (מיושר לשמאל), עם כפתור החלפת שפה.
+- **ללא סיסמת-על** — הכניסה מתבצעת בעזרת שאלות זיכרון אישיות (וזיהוי ביומטרי בהמשך).
+- **מקומי בלבד** — כל המידע נשמר על המכשיר (localStorage) ולא נשלח לשום שרת.
+
+## מה כבר קיים (שלב ראשון)
+
+### שאלון הרשמה ראשוני — 3 שלבים
+1. **קצת עליך** — שם, מין (בן/בת), מצב משפחתי, שם בן/בת הזוג (מותאם למין ולמצב המשפחתי),
+   ושמות הילדים (עם אפשרות להוסיף שדות).
+2. **דרכי יצירת קשר** — אימייל, כתובת ומיקוד, מספר טלפון.
+3. **שאלות זיכרון אישיות** — מאגר שאלות שחלקן מותאמות לתשובות הקודמות
+   (שם בן/בת הזוג, שם הילד וכו'), עם אפשרות להוסיף שאלות משלך.
+
+### העמוד הראשי
+לאחר סיום ההרשמה מתבצעת כניסה לעמוד הראשי, ובמרכזו כפתור **+** גדול
+להוספת סיסמאות חדשות. סיסמאות שמורות מוצגות בכרטיסים גדולים עם הצגה/הסתרה,
+העתקה ומחיקה.
+
+## הרצה
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ופותחים את http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## מבנה הקוד
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/` — שורש Next.js (App Router), פריסה גלובלית ועמוד ראשי שמנתב בין הרשמה לעמוד הראשי.
+- `components/Onboarding.tsx` — שאלון ההרשמה בן 3 השלבים.
+- `components/MainScreen.tsx` — העמוד הראשי, כפתור ההוספה וכרטיסי הסיסמאות.
+- `components/ui.tsx` — רכיבי UI גדולים ונגישים משותפים.
+- `lib/i18n.ts` — מחרוזות בעברית ובאנגלית והתאמות לשון (מגדר/מצב משפחתי).
+- `lib/storage.ts` — שמירה/טעינה מקומית (localStorage).
+- `lib/types.ts` — טיפוסי הנתונים.
 
-## Learn More
+## הצעדים הבאים
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- מסך כניסה חוזר (אימות בעזרת שאלות הזיכרון או זיהוי ביומטרי).
+- עריכת סיסמאות קיימות וחיפוש.
+- הצפנת הנתונים השמורים.
