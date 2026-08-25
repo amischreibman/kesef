@@ -1,0 +1,487 @@
+<title>דלת חתול מחליקה</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Suez+One&display=swap">
+<style>
+  :root {
+    --paper: #F2F4F5;
+    --surface: #FBFCFC;
+    --ink: #232B31;
+    --muted: #5D6B74;
+    --line: #C3CCD1;
+    --frame-fill: #E2E8EB;
+    --outside: #E7ECEE;
+    --door: #B0761F;
+    --mech: #2C5F9E;
+    --mech-soft: #DAE5F2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #191D20;
+      --surface: #21272C;
+      --ink: #E3E8EB;
+      --muted: #96A3AC;
+      --line: #414C54;
+      --frame-fill: #2B3339;
+      --outside: #14181B;
+      --door: #D9A050;
+      --mech: #7AA9E0;
+      --mech-soft: #2B3B4E;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #191D20;
+    --surface: #21272C;
+    --ink: #E3E8EB;
+    --muted: #96A3AC;
+    --line: #414C54;
+    --frame-fill: #2B3339;
+    --outside: #14181B;
+    --door: #D9A050;
+    --mech: #7AA9E0;
+    --mech-soft: #2B3B4E;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    direction: rtl;
+    font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
+    font-size: 16.5px;
+    line-height: 1.75;
+    margin: 0;
+  }
+  .page {
+    max-width: 860px;
+    margin-inline: auto;
+    padding: 48px 24px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  header .eyebrow {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+  h1 {
+    font-family: 'Suez One', 'Heebo', serif;
+    font-weight: 400;
+    font-size: clamp(34px, 6vw, 48px);
+    line-height: 1.15;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  h2 {
+    font-family: 'Suez One', 'Heebo', serif;
+    font-weight: 400;
+    font-size: 25px;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  p { margin: 0 0 14px; max-width: 66ch; }
+  section > p:last-child { margin-bottom: 0; }
+  .lead { font-size: 18.5px; max-width: 62ch; }
+
+  figure {
+    margin: 20px 0 0;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    padding: 20px 14px 14px;
+    overflow-x: auto;
+  }
+  figcaption {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 10px;
+    padding-inline: 6px;
+    max-width: none;
+  }
+  figcaption b { color: var(--ink); font-weight: 700; }
+
+  svg { max-width: 100%; height: auto; display: block; margin-inline: auto; }
+  svg text {
+    font-family: 'Heebo', Arial, sans-serif;
+    font-size: 13px;
+    fill: var(--ink);
+    direction: rtl;
+    paint-order: stroke;
+    stroke: var(--surface);
+    stroke-width: 3.5px;
+    stroke-linejoin: round;
+  }
+  svg .fig-title { font-size: 15px; font-weight: 700; }
+  svg .lab { fill: var(--muted); font-size: 12.5px; }
+  svg .lab-strong { font-weight: 700; fill: var(--door); }
+  svg .lab-mech { fill: var(--mech); font-weight: 500; }
+  svg .subcap { fill: var(--muted); font-size: 13px; font-weight: 500; }
+  .frame { fill: var(--frame-fill); stroke: var(--ink); stroke-width: 2.5; }
+  .inner { fill: var(--paper); stroke: var(--ink); stroke-width: 1.2; }
+  .outside-a { fill: var(--outside); stroke: var(--muted); stroke-dasharray: 5 4; stroke-width: 1.2; }
+  .rail { stroke: var(--ink); stroke-width: 1; opacity: 0.55; }
+  .door-p { stroke: var(--door); stroke-width: 2.5; }
+  .hatch { stroke: var(--door); stroke-width: 1.3; opacity: 0.5; }
+  .mech-part { fill: var(--mech-soft); stroke: var(--mech); stroke-width: 1.8; }
+  .arm { stroke: var(--mech); stroke-width: 7; stroke-linecap: round; }
+  .rod { stroke: var(--mech); stroke-width: 5; stroke-linecap: round; }
+  .pivot { fill: var(--surface); stroke: var(--ink); stroke-width: 1.8; }
+  .g-arm { stroke: var(--muted); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 7 5; fill: none; }
+  .g-circle { stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 6 5; fill: none; }
+  .centerline { stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 9 4 2 4; }
+  .dim { stroke: var(--muted); stroke-width: 1.3; }
+  .ext { stroke: var(--muted); stroke-width: 1; opacity: 0.7; }
+  .sweep { stroke: var(--mech); stroke-width: 1.6; stroke-dasharray: 5 4; fill: none; }
+  .leader { stroke: var(--muted); stroke-width: 1; }
+  .dimhead { fill: var(--muted); }
+  .sweephead { fill: var(--mech); }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 16px;
+    font-size: 15.5px;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 9px 14px;
+    text-align: right;
+    vertical-align: top;
+  }
+  th { background: var(--frame-fill); font-weight: 700; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+
+  .callout {
+    border: 1px solid var(--line);
+    border-inline-start: 4px solid var(--mech);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 16px 20px;
+    margin-top: 20px;
+  }
+  .callout p { margin: 0; max-width: none; }
+  .callout .callout-title { font-weight: 700; color: var(--mech); display: block; margin-bottom: 4px; }
+
+  .formula {
+    direction: ltr;
+    text-align: center;
+    font-size: 22px;
+    font-variant-numeric: tabular-nums;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px;
+    margin: 18px 0;
+  }
+  .formula small { color: var(--muted); font-size: 14px; display: block; direction: rtl; margin-top: 6px; }
+
+  ol.steps { padding-inline-start: 22px; margin: 0; display: flex; flex-direction: column; gap: 10px; max-width: 66ch; }
+  ol.steps li::marker { font-weight: 700; color: var(--mech); }
+
+  footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 18px; }
+  footer p { margin: 0; }
+</style>
+
+<div class="page" lang="he">
+
+  <header>
+    <p class="eyebrow">תוכנית מכנית · שלב 1 — המנגנון</p>
+    <h1>דלת חתול מחליקה</h1>
+    <p class="lead">
+      תרגום הסקיצה שלך לשרטוט עבודה: דלת שנעה ימינה ושמאלה על שתי מסילות, מונעת על ידי סרוו
+      אחד דרך שתי זרועות. המנגנון הזה נקרא <b>ארכובה־מחליק</b> (crank-slider) — זרוע 1 היא
+      הארכובה שמסתובבת עם הסרוו, וזרוע 2 היא הטלטל שממיר את הסיבוב לתנועה קווית.
+    </p>
+  </header>
+
+  <section>
+    <h2>עקרון הפעולה — שני מצבי הקצה</h2>
+    <p>
+      הסרוו קבוע למסגרת (או לקיר) מתחת לדלת. כשהוא מסתובב מ־0° ל־180°, קצה זרוע 1 עובר
+      חצי סיבוב, וזרוע 2 מושכת את התושבת שמוברגת לתחתית הלוח — הדלת מחליקה שמאלה עד שהפתח
+      נפתח במלואו. סיבוב חזרה סוגר אותה.
+    </p>
+
+    <figure>
+      <svg viewBox="0 0 960 470" role="img" aria-label="שרטוט חזית של הדלת בשני מצבים: סגור — הלוח מכסה את הפתח והזרועות מתוחות; פתוח — הלוח הוחלק שמאלה, הפתח חשוף והזרועות מקופלות אחרי סיבוב סרוו של 180 מעלות">
+        <defs>
+          <pattern id="h1" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <path d="M3.5,0 V7" class="hatch"/>
+          </pattern>
+          <marker id="sw1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" class="sweephead"/>
+          </marker>
+        </defs>
+
+        <!-- מצב סגור (מימין) -->
+        <g transform="translate(490,0)">
+          <text class="fig-title" x="210" y="26" text-anchor="middle">מצב סגור · סרוו ב־0°</text>
+          <rect x="20" y="44" width="380" height="256" class="frame"/>
+          <rect x="48" y="72" width="324" height="200" class="inner"/>
+          <rect x="214" y="72" width="154" height="200" class="outside-a"/>
+          <line x1="48" y1="79" x2="372" y2="79" class="rail"/>
+          <line x1="48" y1="85" x2="372" y2="85" class="rail"/>
+          <line x1="48" y1="259" x2="372" y2="259" class="rail"/>
+          <line x1="48" y1="265" x2="372" y2="265" class="rail"/>
+          <rect x="206" y="76" width="166" height="192" fill="url(#h1)" class="door-p"/>
+          <rect x="284" y="268" width="10" height="68" class="mech-part"/>
+          <rect x="96" y="388" width="12" height="10" class="mech-part"/>
+          <rect x="172" y="388" width="12" height="10" class="mech-part"/>
+          <rect x="108" y="376" width="64" height="34" rx="4" class="mech-part"/>
+          <line x1="140" y1="392" x2="187" y2="375" class="arm"/>
+          <line x1="187" y1="375" x2="289" y2="340" class="rod"/>
+          <circle cx="140" cy="392" r="7" class="pivot"/>
+          <circle cx="140" cy="392" r="2" fill="currentColor"/>
+          <circle cx="187" cy="375" r="4.5" class="pivot"/>
+          <circle cx="289" cy="340" r="5" class="pivot"/>
+          <text x="210" y="62" text-anchor="middle" class="lab">מסגרת</text>
+          <text x="289" y="160" text-anchor="middle" class="lab-strong">הדלת</text>
+          <text x="289" y="178" text-anchor="middle" class="lab">לוח מחליק</text>
+          <line x1="326" y1="336" x2="299" y2="339" class="leader"/>
+          <text x="356" y="340" text-anchor="middle" class="lab">תושבת</text>
+          <line x1="238" y1="352" x2="250" y2="334" class="leader"/>
+          <text x="256" y="328" text-anchor="middle" class="lab-mech">זרוע 2</text>
+          <line x1="168" y1="388" x2="202" y2="408" class="leader"/>
+          <text x="224" y="414" text-anchor="middle" class="lab-mech">זרוע 1</text>
+          <text x="140" y="440" text-anchor="middle" class="lab">סרוו 180°</text>
+        </g>
+
+        <!-- מצב פתוח (משמאל) -->
+        <g transform="translate(10,0)">
+          <text class="fig-title" x="210" y="26" text-anchor="middle">מצב פתוח · סרוו ב־180°</text>
+          <rect x="20" y="44" width="380" height="256" class="frame"/>
+          <rect x="48" y="72" width="324" height="200" class="inner"/>
+          <rect x="214" y="72" width="154" height="200" class="outside-a"/>
+          <line x1="48" y1="79" x2="372" y2="79" class="rail"/>
+          <line x1="48" y1="85" x2="372" y2="85" class="rail"/>
+          <line x1="48" y1="259" x2="372" y2="259" class="rail"/>
+          <line x1="48" y1="265" x2="372" y2="265" class="rail"/>
+          <rect x="48" y="76" width="166" height="192" fill="url(#h1)" class="door-p"/>
+          <rect x="126" y="268" width="10" height="68" class="mech-part"/>
+          <rect x="96" y="388" width="12" height="10" class="mech-part"/>
+          <rect x="172" y="388" width="12" height="10" class="mech-part"/>
+          <rect x="108" y="376" width="64" height="34" rx="4" class="mech-part"/>
+          <line x1="140" y1="392" x2="100" y2="430" class="arm"/>
+          <line x1="100" y1="430" x2="131" y2="340" class="rod"/>
+          <circle cx="140" cy="392" r="7" class="pivot"/>
+          <circle cx="140" cy="392" r="2" fill="currentColor"/>
+          <circle cx="100" cy="430" r="4.5" class="pivot"/>
+          <circle cx="131" cy="340" r="5" class="pivot"/>
+          <path d="M168.2,381.7 A30 30 0 0 1 118.2,412.6" class="sweep" marker-end="url(#sw1)"/>
+          <text x="204" y="420" text-anchor="middle" class="lab-mech">180°</text>
+          <line x1="291" y1="96" x2="291" y2="87" class="leader"/>
+          <text x="291" y="112" text-anchor="middle" class="lab">מסילה עליונה</text>
+          <text x="291" y="176" text-anchor="middle" class="lab">חוץ</text>
+          <line x1="291" y1="248" x2="291" y2="257" class="leader"/>
+          <text x="291" y="242" text-anchor="middle" class="lab">מסילה תחתונה</text>
+          <text x="131" y="168" text-anchor="middle" class="lab">הדלת</text>
+        </g>
+      </svg>
+      <figcaption>
+        <b>שרטוט 1 — מבט חזית.</b> הפתח נמצא בצד ימין של המסגרת; רוחב המסגרת הפנימי כפול מרוחב
+        הפתח, כך שלדלת יש לאן לזוז. התושבת מוברגת לפנים הלוח ויורדת לפני המסגרת אל המפרק —
+        כך אין צורך בחריץ במסילה התחתונה.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>הגיאומטריה — כמה ארוכות הזרועות?</h2>
+    <p>
+      כל התכן נובע מכלל אחד: כשהסרוו מסתובב 180°, קצה זרוע 1 עובר מקצה אחד של הקוטר לקצה
+      השני. לכן מהלך הדלת שווה בדיוק לפעמיים אורך זרוע 1, בלי תלות באורך של זרוע 2.
+    </p>
+
+    <div class="formula">
+      S = 2 × R
+      <small>‏S — מהלך הדלת · ‏R — אורך זרוע 1 (מציר הסרוו עד המפרק). זרוע 2 (L) לוקחים פי 2.5–3 מ־R.</small>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 760 330" role="img" aria-label="שרטוט גיאומטרי: ציר הסרוו, מעגל הסיבוב של זרוע 1 ברדיוס R, ושתי תצורות הקצה של הזרועות. המרחק בין שתי נקודות הקצה על קו התנועה הוא המהלך S השווה לפעמיים R">
+        <defs>
+          <marker id="ad2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" class="dimhead"/>
+          </marker>
+          <marker id="sw2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" class="sweephead"/>
+          </marker>
+        </defs>
+
+        <line x1="120" y1="100" x2="700" y2="100" class="centerline"/>
+        <text x="235" y="86" text-anchor="middle" class="lab">קו התנועה של התושבת</text>
+        <line x1="250" y1="230" x2="560" y2="230" class="centerline"/>
+
+        <circle cx="390" cy="230" r="110" class="g-circle"/>
+
+        <!-- e -->
+        <line x1="200" y1="100" x2="200" y2="230" class="dim" marker-start="url(#ad2)" marker-end="url(#ad2)"/>
+        <text x="184" y="172" text-anchor="middle" class="lab">e</text>
+
+        <!-- מצב פתוח (רפאים) -->
+        <line x1="390" y1="230" x2="280" y2="230" class="g-arm"/>
+        <line x1="280" y1="230" x2="404.5" y2="100" class="g-arm"/>
+        <circle cx="280" cy="230" r="4.5" class="pivot"/>
+        <circle cx="404.5" cy="100" r="5" class="pivot"/>
+        <text x="424" y="124" text-anchor="middle" class="lab">פתוח</text>
+
+        <!-- מצב סגור (מלא) -->
+        <line x1="390" y1="230" x2="500" y2="230" class="arm"/>
+        <line x1="500" y1="230" x2="624.5" y2="100" class="rod"/>
+        <circle cx="390" cy="230" r="7" class="pivot"/>
+        <circle cx="390" cy="230" r="2" fill="currentColor"/>
+        <circle cx="500" cy="230" r="4.5" class="pivot"/>
+        <circle cx="624.5" cy="100" r="5" class="pivot"/>
+        <text x="651" y="124" text-anchor="middle" class="lab">סגור</text>
+
+        <text x="445" y="219" text-anchor="middle" class="lab-mech">R</text>
+        <text x="580" y="160" text-anchor="middle" class="lab-mech">L</text>
+        <text x="390" y="266" text-anchor="middle" class="lab">ציר הסרוו</text>
+
+        <!-- מהלך -->
+        <line x1="624.5" y1="92" x2="624.5" y2="44" class="ext"/>
+        <line x1="404.5" y1="92" x2="404.5" y2="44" class="ext"/>
+        <line x1="404.5" y1="52" x2="624.5" y2="52" class="dim" marker-start="url(#ad2)" marker-end="url(#ad2)"/>
+        <text x="514" y="40" text-anchor="middle">מהלך S = ‎2·R</text>
+
+        <path d="M435,230 A45 45 0 0 1 345,230" class="sweep" marker-end="url(#sw2)"/>
+        <text x="390" y="300" text-anchor="middle" class="lab-mech">180°</text>
+      </svg>
+      <figcaption>
+        <b>שרטוט 2 — גיאומטריית הארכובה.</b> בשני הקצוות הזרועות נמתחות בקו ישר, ולכן שתי נקודות
+        הקצה מרוחקות זו מזו בדיוק 2·R. ההיסט האנכי e (בין ציר הסרוו לקו התנועה) צריך להיות קטן
+        ככל האפשר, וזרוע 2 ארוכה יחסית — כך הזווית שלה נשארת רדודה והכוח הצידי על המסילה קטן.
+      </figcaption>
+    </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>רכיב</th><th>מידה מוצעת</th><th>הנימוק</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>הפתח לחתול</td><td class="num">20 × 25 ס״מ</td><td>מתאים לחתול בוגר ממוצע</td></tr>
+          <tr><td>לוח הדלת</td><td class="num">24 × 29 ס״מ</td><td>חפיפה של ‎2 ס״מ סביב הפתח בכל צד</td></tr>
+          <tr><td>מהלך S</td><td class="num">‎22 ס״מ</td><td>רוחב הפתח + חפיפה</td></tr>
+          <tr><td>זרוע 1 ‏(R)</td><td class="num">‎11 ס״מ</td><td>S חלקי 2</td></tr>
+          <tr><td>זרוע 2 ‏(L)</td><td class="num">28–33 ס״מ</td><td>פי 2.5–3 מ־R — זווית רדודה, פחות חיכוך</td></tr>
+          <tr><td>היסט אנכי e</td><td class="num">עד ‎5 ס״מ</td><td>קטן ככל האפשר; לא חייב אפס</td></tr>
+          <tr><td>סרוו</td><td>MG996R ‏(‎11 ק״ג·ס״מ)</td><td>בזרוע של ‎11 ס״מ נותן כ־‎1 ק״ג דחיפה — מספיק אם הדלת מחליקה חופשי. אם יש חיכוך: DS3218 ‏(‎20 ק״ג·ס״מ)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <p>
+        <span class="callout-title">נעילה עצמית בחינם</span>
+        בשני הקצוות הזרועות עומדות ב״נקודה מתה״: דחיפה של הדלת מעבירה את הכוח בקו ישר דרך ציר
+        הסרוו וכמעט לא יוצרת עליו מומנט. כלומר — במצב סגור החתול לא יכול לדחוף את הדלת ולפתוח
+        אותה, גם כשהסרוו לא מפעיל כוח.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>פרטי ביצוע</h2>
+    <p>
+      שני הפרטים שקובעים אם המנגנון יעבוד חלק: הדלת חייבת להחליק במסילות בקלות (ביד — פחות
+      מ־300 גרם התנגדות), והמפרקים בקצות הזרועות חייבים להסתובב חופשי בלי חופש אנכי.
+    </p>
+
+    <figure>
+      <svg viewBox="0 0 760 290" role="img" aria-label="שני פרטי ביצוע: מימין חתך של המסילה התחתונה — פרופיל U עם הלוח בפנים, מרווח קטן משני הצדדים ופס החלקה בתחתית; משמאל מפרק — שתי זרועות חופפות עם בורג M3, דסקית ניילון ביניהן ואום נעילה">
+        <defs>
+          <pattern id="h3" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <path d="M3.5,0 V7" class="hatch"/>
+          </pattern>
+          <marker id="ad3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" class="dimhead"/>
+          </marker>
+        </defs>
+
+        <!-- חתך מסילה (מימין) -->
+        <rect x="546" y="60" width="34" height="110" fill="url(#h3)" class="door-p"/>
+        <rect x="520" y="120" width="14" height="64" class="frame"/>
+        <rect x="592" y="120" width="14" height="64" class="frame"/>
+        <rect x="520" y="180" width="86" height="14" class="frame"/>
+        <rect x="534" y="170" width="58" height="10" class="mech-part"/>
+        <text x="563" y="48" text-anchor="middle" class="lab-strong">הלוח</text>
+        <line x1="534" y1="100" x2="546" y2="100" class="dim" marker-start="url(#ad3)" marker-end="url(#ad3)"/>
+        <line x1="508" y1="96" x2="532" y2="100" class="leader"/>
+        <text x="468" y="94" text-anchor="middle" class="lab">מרווח ‎1–2 מ״מ</text>
+        <line x1="596" y1="175" x2="638" y2="164" class="leader"/>
+        <text x="682" y="162" text-anchor="middle" class="lab">פס החלקה</text>
+        <text x="563" y="226" text-anchor="middle" class="lab">מסילה — פרופיל U</text>
+        <text x="563" y="262" text-anchor="middle" class="subcap">חתך אנכי של המסילה התחתונה</text>
+
+        <!-- פרט מפרק (משמאל) -->
+        <rect x="110" y="104" width="150" height="14" class="mech-part"/>
+        <rect x="188" y="118" width="24" height="6" class="frame"/>
+        <rect x="150" y="124" width="150" height="14" class="mech-part"/>
+        <rect x="188" y="138" width="24" height="6" class="frame"/>
+        <rect x="184" y="144" width="32" height="16" class="mech-part"/>
+        <rect x="196" y="86" width="8" height="78" class="mech-part"/>
+        <rect x="188" y="72" width="24" height="14" class="mech-part"/>
+        <line x1="156" y1="68" x2="186" y2="78" class="leader"/>
+        <text x="128" y="66" text-anchor="middle" class="lab">בורג M3</text>
+        <text x="74" y="115" text-anchor="middle" class="lab-mech">זרוע 1</text>
+        <text x="336" y="135" text-anchor="middle" class="lab-mech">זרוע 2</text>
+        <line x1="214" y1="121" x2="280" y2="96" class="leader"/>
+        <text x="322" y="92" text-anchor="middle" class="lab">דסקית ניילון</text>
+        <line x1="218" y1="152" x2="240" y2="168" class="leader"/>
+        <text x="286" y="176" text-anchor="middle" class="lab">אום נעילה (ניילוק)</text>
+        <text x="200" y="262" text-anchor="middle" class="subcap">מפרק חופשי — להדק רק עד שהסיבוב חלק, בלי חופש</text>
+      </svg>
+      <figcaption>
+        <b>שרטוט 3 — פרטים.</b> המסילה העליונה עמוקה מהתחתונה, כך שאפשר להרים את הלוח פנימה
+        ולהוריד אותו למקום בהרכבה. פס החלקה (סרט טפלון או UHMW) בתחתית המסילה מוריד את
+        החיכוך דרמטית. זרוע 1 מתחברת לצלחת הסרוו (horn) בברגים — לא ישירות לציר.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>רשימת חלקים</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>פריט</th><th>כמות</th><th>הערות</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>לוח דלת — PVC מוקצף ‎5 מ״מ</td><td class="num">1</td><td>קל וחלק; אפשר גם דיקט ‎4 מ״מ מלוטש</td></tr>
+          <tr><td>מסגרת — עץ או PVC</td><td class="num">1</td><td>רוחב פנימי כפול מרוחב הפתח</td></tr>
+          <tr><td>מסילת U אלומיניום, פנים ‎6–8 מ״מ</td><td class="num">2</td><td>עליונה עמוקה מהתחתונה (להרכבת הלוח)</td></tr>
+          <tr><td>סרוו MG996R או DS3218</td><td class="num">1</td><td>גלגלי שיניים ממתכת, טווח 180°</td></tr>
+          <tr><td>זרוע 1 — פס אלומיניום שטוח או הדפסת תלת־ממד</td><td class="num">1</td><td>אורך בין הצירים = חצי מהמהלך</td></tr>
+          <tr><td>זרוע 2 — פס אלומיניום שטוח</td><td class="num">1</td><td>פי 2.5–3 מזרוע 1</td></tr>
+          <tr><td>ברגי M3 + אומי נעילה + דסקיות ניילון</td><td class="num">4–6</td><td>שני מפרקים + חיבור התושבת ללוח</td></tr>
+          <tr><td>Arduino Uno/Nano + ספק ‎5–6V ‏2.5A</td><td class="num">1</td><td>הזנת הסרוו מהספק, לא מהארדואינו; GND משותף</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>סדר העבודה</h2>
+    <ol class="steps">
+      <li>לבנות את המסגרת והמסילות בלבד, ולוודא שהלוח מחליק ביד לכל אורך המהלך בלי לתפוס. זה שער הכניסה לכל השאר.</li>
+      <li>לחתוך את הזרועות, להרכיב את המפרקים, ולסובב את זרוע 1 ביד — הדלת צריכה לעבור מסגור מלא לפתיחה מלאה בחצי סיבוב.</li>
+      <li>לחבר את הסרוו ולכייל בקוד את שתי זוויות הקצה. להזיז לאט (מעלה־מעלה עם השהיה קצרה) — גם עדין יותר לחתול וגם מוריד את צריכת הזרם.</li>
+      <li>רק אחרי שהמכניקה עובדת — לבחור חיישן (RFID על הקולר, PIR, או מגנט). המנגנון לא תלוי בבחירה הזאת.</li>
+    </ol>
+    <div class="callout">
+      <p>
+        <span class="callout-title">בטיחות</span>
+        התנועה האיטית היא גם אמצעי הבטיחות: דלת שנסגרת לאט לא צובטת זנב. בהמשך אפשר להוסיף
+        חישת זרם על הסרוו — אם הזרם קופץ באמצע סגירה, משהו חוסם ופותחים בחזרה.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <p>מבוסס על סקיצת העיפרון המקורית: מצב פתוח ומצב סגור, סרוו 180° עם זרוע 1 וזרוע 2. שלב 2 — אלקטרוניקה וחיישן.</p>
+  </footer>
+
+</div>
