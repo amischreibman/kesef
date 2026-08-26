@@ -1,0 +1,341 @@
+<title>רכש דלת החתול</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Suez+One&display=swap">
+<style>
+  :root {
+    --paper: #F2F4F5;
+    --surface: #FBFCFC;
+    --ink: #232B31;
+    --muted: #5D6B74;
+    --line: #C3CCD1;
+    --frame-fill: #E2E8EB;
+    --door: #B0761F;
+    --mech: #2C5F9E;
+    --mech-soft: #DAE5F2;
+    --done: #3B7A4A;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #191D20;
+      --surface: #21272C;
+      --ink: #E3E8EB;
+      --muted: #96A3AC;
+      --line: #414C54;
+      --frame-fill: #2B3339;
+      --door: #D9A050;
+      --mech: #7AA9E0;
+      --mech-soft: #2B3B4E;
+      --done: #6FBF82;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #191D20;
+    --surface: #21272C;
+    --ink: #E3E8EB;
+    --muted: #96A3AC;
+    --line: #414C54;
+    --frame-fill: #2B3339;
+    --door: #D9A050;
+    --mech: #7AA9E0;
+    --mech-soft: #2B3B4E;
+    --done: #6FBF82;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    direction: rtl;
+    font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    margin: 0;
+  }
+  .page { max-width: 880px; margin-inline: auto; padding: 44px 20px 80px; }
+  header .eyebrow {
+    color: var(--muted); font-size: 13px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 8px;
+  }
+  h1 {
+    font-family: 'Suez One', 'Heebo', serif; font-weight: 400;
+    font-size: clamp(30px, 5.5vw, 42px); line-height: 1.15; margin: 0 0 10px;
+  }
+  .lead { color: var(--muted); max-width: 64ch; margin: 0 0 6px; }
+
+  .progress {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 18px; margin: 22px 0 8px;
+  }
+  .progress .count { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .progress .bar { flex: 1; height: 8px; background: var(--frame-fill); border-radius: 99px; overflow: hidden; }
+  .progress .bar > div { height: 100%; width: 0%; background: var(--done); border-radius: 99px; transition: width .25s; }
+
+  .howto {
+    border: 1px solid var(--line); border-inline-start: 4px solid var(--mech);
+    border-radius: 8px; background: var(--surface); padding: 14px 18px; margin: 14px 0 30px;
+    font-size: 15px;
+  }
+  .howto b { color: var(--mech); }
+
+  h2 {
+    font-family: 'Suez One', 'Heebo', serif; font-weight: 400; font-size: 22px;
+    margin: 34px 0 12px;
+  }
+
+  .item {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; align-items: start;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .item input[type="checkbox"] {
+    width: 20px; height: 20px; margin-top: 4px; accent-color: var(--done); cursor: pointer;
+  }
+  .item.checked { opacity: 0.62; }
+  .item.checked .name { text-decoration: line-through; }
+  .name { font-weight: 700; }
+  .spec { color: var(--muted); font-size: 14px; grid-column: 2; }
+  .verify { font-size: 13.5px; color: var(--door); grid-column: 2; margin-top: 2px; }
+  .links { grid-column: 2; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .links a {
+    display: inline-block; text-decoration: none; font-size: 14px; font-weight: 500;
+    border-radius: 7px; padding: 5px 14px;
+    background: var(--mech); color: var(--paper); border: 1px solid var(--mech);
+  }
+  .links a.alt { background: transparent; color: var(--mech); }
+  .links a:focus-visible { outline: 2px solid var(--door); outline-offset: 2px; }
+  .price { color: var(--ink); font-size: 14.5px; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: left; }
+  .qty { color: var(--muted); font-size: 13px; white-space: nowrap; display: block; text-align: left; }
+
+  .local {
+    border: 1px dashed var(--line); border-radius: 10px; padding: 14px 18px;
+    color: var(--muted); font-size: 15px; margin-top: 26px;
+  }
+  .local b { color: var(--ink); }
+  footer { color: var(--muted); font-size: 13.5px; border-top: 1px solid var(--line); margin-top: 36px; padding-top: 16px; }
+  footer p { margin: 0 0 6px; }
+</style>
+
+<div class="page" lang="he">
+  <header>
+    <p class="eyebrow">דלת חתול מחליקה · שלב הרכש</p>
+    <h1>רכש דלת החתול</h1>
+    <p class="lead">כל החלקים מהתוכנית, עם קישור ישיר לעמוד המוצר. סמן וי אחרי שהכנסת פריט לסל — הרשימה זוכרת איפה עצרת (בדפדפן הזה).</p>
+  </header>
+
+  <div class="progress" aria-live="polite">
+    <span class="count" id="count">0 מתוך 11</span>
+    <div class="bar"><div id="bar"></div></div>
+  </div>
+
+  <div class="howto">
+    <b>לפני "הוספה לסל", שלוש בדיקות בכל עמוד:</b>
+    ‏(1) דירוג מוכר 4.7 ומעלה עם כמה מאות הזמנות לפחות; ‏(2) בחירת הווריאנט הנכון בעמוד (צבע/כמות/זווית — מצוין ליד כל פריט);
+    ‏(3) משלוח לישראל. אם קישור מת — מונח החיפוש שליד הפריט ימצא זהים.
+  </div>
+
+  <h2>מכניקה</h2>
+
+  <div class="item">
+    <input type="checkbox" data-k="servo">
+    <div>
+      <span class="name">סרוו MG996R</span>
+      <div class="spec">לבחור וריאנט של יחידה אחת (או 2 — גיבוי זול). חיפוש: <span dir="ltr">MG996R 180 degree metal gear</span></div>
+      <div class="verify">לוודא בעמוד: גרסת 180° (לא 360°), גלגלי שיניים ממתכת</div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/1005009351850813.html" target="_blank" rel="noopener">עמוד המוצר</a>
+        <a class="alt" href="https://www.aliexpress.com/item/32863273201.html" target="_blank" rel="noopener">חלופה</a>
+      </div>
+    </div>
+    <div><span class="price">‎$4–8</span><span class="qty">כמות: 1</span></div>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" data-k="horn">
+    <div>
+      <span class="name">צלחת סרוו אלומיניום 25T</span>
+      <div class="spec">מגיע בחבילה של 5 — מספיק אחת, השאר רזרבה. מתאים גם ל־MG996R וגם ל־DS3218. חיפוש: <span dir="ltr">25T aluminum servo horn</span></div>
+      <div class="verify">לוודא בעמוד: שיניים 25T, חורי M3</div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/1005003027854823.html" target="_blank" rel="noopener">עמוד המוצר</a>
+        <a class="alt" href="https://www.aliexpress.com/item/32792830376.html" target="_blank" rel="noopener">חלופה</a>
+      </div>
+    </div>
+    <div><span class="price">‎$4–5</span><span class="qty">כמות: חבילה 1</span></div>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" data-k="flatbar">
+    <div>
+      <span class="name">פס אלומיניום שטוח 6061 — לזרועות</span>
+      <div class="spec">לבחור וריאנט: עובי ‎2 מ״מ, רוחב ‎15–20 מ״מ, אורך ‎50 ס״מ (יוצא ממנו זרוע 1 + זרוע 2). חיפוש: <span dir="ltr">6061 aluminum flat bar 2mm</span></div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/1005004220186551.html" target="_blank" rel="noopener">עמוד המוצר</a>
+        <a class="alt" href="https://www.aliexpress.com/item/1005003101327837.html" target="_blank" rel="noopener">חלופה</a>
+      </div>
+    </div>
+    <div><span class="price">‎$5–10</span><span class="qty">כמות: 1</span></div>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" data-k="rail">
+    <div>
+      <span class="name">פרופיל U אלומיניום — מסילות</span>
+      <div class="spec">לבחור וריאנט: פנים ‎6–8 מ״מ, האורך הארוך ביותר (400 מ״מ) ×‏2. חיפוש: <span dir="ltr">aluminum U channel profile 10x5mm</span></div>
+      <div class="verify">שים לב: למסילה של ‎45+ ס״מ עדיף פרופיל רציף מחנות אלומיניום בארץ — בלי חיבור באמצע המהלך</div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/1005003733083546.html" target="_blank" rel="noopener">עמוד המוצר</a>
+      </div>
+    </div>
+    <div><span class="price">‎$8–12</span><span class="qty">כמות: 2</span></div>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" data-k="pvc">
+    <div>
+      <span class="name">לוח PVC מוקצף ‎5 מ״מ — הדלת</span>
+      <div class="spec">לבחור וריאנט ‎300×400 מ״מ לפחות — הדלת היא ‎24×29 ס״מ, אז ‎200×300 קטן מדי! חיפוש: <span dir="ltr">PVC foam board 5mm 300x400</span></div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/1005006668590994.html" target="_blank" rel="noopener">עמוד המוצר</a>
+        <a class="alt" href="https://www.aliexpress.com/item/32814414957.html" target="_blank" rel="noopener">חלופה</a>
+      </div>
+    </div>
+    <div><span class="price">‎$5–10</span><span class="qty">כמות: 1</span></div>
+  </div>
+
+  <h2>חומרה</h2>
+
+  <div class="item">
+    <input type="checkbox" data-k="screws">
+    <div>
+      <span class="name">ערכת ברגי M3 + אומי נעילה ניילוק</span>
+      <div class="spec">ערכה של ‎100 ברגים + ‎50 ניילוק — מכסה את המפרקים, התושבת והסרוו. חיפוש: <span dir="ltr">M3 nylock nut screws kit</span></div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/1005003466621921.html" target="_blank" rel="noopener">עמוד המוצר</a>
+      </div>
+    </div>
+    <div><span class="price">‎$3.3</span><span class="qty">כמות: ערכה 1</span></div>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" data-k="grommet">
+    <div>
+      <span class="name">בולמי רעידות גומי M3 — להשתקת הסרוו</span>
+      <div class="spec">‏8 יח׳ — הסרוו נתלה עליהם במקום ישירות על העץ. חיפוש: <span dir="ltr">M3 rubber anti vibration isolator</span></div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/32984047386.html" target="_blank" rel="noopener">עמוד המוצר</a>
+        <a class="alt" href="https://www.aliexpress.com/item/32963725532.html" target="_blank" rel="noopener">חלופה</a>
+      </div>
+    </div>
+    <div><span class="price">‎$2–3</span><span class="qty">כמות: סט 1</span></div>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" data-k="ptfe">
+    <div>
+      <span class="name">פס PTFE (טפלון) נדבק — פס החלקה</span>
+      <div class="spec">לבחור וריאנט: רוחב ‎10–20 מ״מ, עובי ‎2 מ״מ. נדבק בתחתית המסילה. חיפוש: <span dir="ltr">PTFE self adhesive strip 10mm</span></div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/1005002219778175.html" target="_blank" rel="noopener">עמוד המוצר</a>
+      </div>
+    </div>
+    <div><span class="price">‎$2</span><span class="qty">כמות: 1</span></div>
+  </div>
+
+  <h2>אלקטרוניקה</h2>
+
+  <div class="item">
+    <input type="checkbox" data-k="nano">
+    <div>
+      <span class="name">Arduino Nano ‏(CH340)</span>
+      <div class="spec">לבחור וריאנט עם כבל USB ועם פינים מולחמים. חיפוש: <span dir="ltr">Arduino Nano V3 CH340 ATmega328P</span></div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/1005002867053794.html" target="_blank" rel="noopener">עמוד המוצר</a>
+        <a class="alt" href="https://www.aliexpress.com/item/32518770128.html" target="_blank" rel="noopener">חלופה (כולל כבל)</a>
+      </div>
+    </div>
+    <div><span class="price">‎$3–8</span><span class="qty">כמות: 1</span></div>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" data-k="psu">
+    <div>
+      <span class="name">ספק כוח ‎6V ‏3A</span>
+      <div class="spec">‏3A ומעלה — הסרוו מושך זרם גבוה בהתנעה. להוסיף באותה הזמנה מתאם שקע DC נקבה עם בורגי הידוק. חיפוש: <span dir="ltr">6V 3A power supply</span> + <span dir="ltr">DC female jack terminal adapter 5.5mm</span></div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/32902232178.html" target="_blank" rel="noopener">עמוד המוצר</a>
+      </div>
+    </div>
+    <div><span class="price">‎$12.6</span><span class="qty">כמות: 1</span></div>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" data-k="wires">
+    <div>
+      <span class="name">חוטי חיבור Dupont</span>
+      <div class="spec">ערכה מעורבת ‎20 ס״מ (זכר–זכר + זכר–נקבה). חיפוש: <span dir="ltr">dupont jumper wires 40pin kit</span></div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/32891879068.html" target="_blank" rel="noopener">עמוד המוצר</a>
+        <a class="alt" href="https://www.aliexpress.com/item/4000203371860.html" target="_blank" rel="noopener">חלופה</a>
+      </div>
+    </div>
+    <div><span class="price">‎$2–4</span><span class="qty">כמות: ערכה 1</span></div>
+  </div>
+
+  <h2>אופציונלי — שדרוג</h2>
+
+  <div class="item">
+    <input type="checkbox" data-k="ds3218">
+    <div>
+      <span class="name">סרוו DS3218 ‏(20 ק״ג·ס״מ) — במקום ה־MG996R</span>
+      <div class="spec">אם תרצה שריון כוח או שהחיכוך יתברר גבוה. חיפוש: <span dir="ltr">DS3218 20KG 180</span></div>
+      <div class="verify">חובה לבחור בעמוד את וריאנט ה־180° (יש גם 270°!)</div>
+      <div class="links">
+        <a href="https://www.aliexpress.com/item/1005007646607686.html" target="_blank" rel="noopener">עמוד המוצר</a>
+        <a class="alt" href="https://www.aliexpress.com/item/32854736941.html" target="_blank" rel="noopener">חלופה (כולל צלחת)</a>
+      </div>
+    </div>
+    <div><span class="price">‎$10–15</span><span class="qty">כמות: 0–1</span></div>
+  </div>
+
+  <div class="local">
+    <b>שני דברים שכדאי לקנות בארץ ולא מסין:</b> עץ/לוח למסגרת (כל חנות בניין, גם יחתכו לך למידה),
+    ואם תרצה — פרופילי ה־U באורך רציף מחנות אלומיניום. כבדים למשלוח וזולים מקומית.
+  </div>
+
+  <footer>
+    <p>סה״כ משוער לרכישה בסיסית (בלי ה־DS3218): ‎35–55 דולר, תלוי במוכרים ובמבצעים.</p>
+    <p>הקישורים נאספו מתוצאות חיפוש עדכניות; אם עמוד ירד — מונח החיפוש שליד הפריט ימצא מוצר זהה.</p>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var boxes = document.querySelectorAll('.item input[type="checkbox"]');
+    var KEY = 'catdoor-shopping';
+    var state = {};
+    try { state = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { state = {}; }
+
+    function render() {
+      var done = 0;
+      boxes.forEach(function (b) {
+        var on = !!state[b.dataset.k];
+        b.checked = on;
+        b.closest('.item').classList.toggle('checked', on);
+        if (on) done++;
+      });
+      var el = document.getElementById('count');
+      var bar = document.getElementById('bar');
+      if (el) el.textContent = done + ' מתוך ' + boxes.length;
+      if (bar) bar.style.width = (boxes.length ? (done / boxes.length) * 100 : 0) + '%';
+    }
+
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        state[b.dataset.k] = b.checked;
+        try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+        render();
+      });
+    });
+
+    render();
+  })();
+</script>
